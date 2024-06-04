@@ -1,6 +1,7 @@
 'use strict'
 const path = require('path')
 const defaultSettings = require('./src/settings.js')
+process.env.BROWSER = 'edge'
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -32,6 +33,7 @@ module.exports = {
   devServer: {
     port: port,
     open: true,
+    // autoOpenBrowser: 'edge',
     overlay: {
       warnings: false,
       errors: true

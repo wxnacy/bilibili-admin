@@ -10,6 +10,7 @@ import Layout from '@/layout'
 import componentsRouter from './modules/components'
 import chartsRouter from './modules/charts'
 import tableRouter from './modules/table'
+import biliRouter from './modules/bili'
 import nestedRouter from './modules/nested'
 
 /**
@@ -70,13 +71,14 @@ export const constantRoutes = [
     component: () => import('@/views/error-page/401'),
     hidden: true
   },
+  biliRouter,
   {
     path: '/',
     component: Layout,
     redirect: '/dashboard',
     children: [
       {
-        path: 'dashboard',
+        path: 'dashboar',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
         meta: { title: 'Dashboard', icon: 'dashboard', affix: true }

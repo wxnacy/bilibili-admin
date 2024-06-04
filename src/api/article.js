@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { fetchGet } from '@/api/request'
 
 export function fetchList(query) {
   return request({
@@ -39,3 +40,8 @@ export function updateArticle(data) {
     data
   })
 }
+
+export function getAlbums() {
+  return fetchGet('/album')
+}
+
