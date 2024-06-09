@@ -5,8 +5,8 @@
     },
     "script": "npm start",
     "disable-logs": "true",
-    "out_file": "/Users/wxnacy/Documents/Projects/wxnacy/bilibili-admin/logs/admin.log",
-    "error_file": "/Users/wxnacy/Documents/Projects/wxnacy/bilibili-admin/logs/admin-error.log",
+    "out_file": "/Users/wxnacy/Downloads/bili_cli/logs/pm2-admin.log",
+    "error_file": "/Users/wxnacy/Downloads/bili_cli/logs/pm2-admin-error.log",
     "autorestart": false
 }
 
