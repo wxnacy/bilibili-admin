@@ -2,9 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.name" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.bili_name" placeholder="Bili" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in biliOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-      </el-select>
+      <AuthOption v-model="listQuery" />
       <AlbumOption v-model="listQuery" />
       <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
         <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
@@ -12,15 +10,6 @@
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
-        Add
-      </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
-        Export
-      </el-button>
-      <el-checkbox v-model="showReviewer" class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1">
-        reviewer
-      </el-checkbox>
     </div>
 
     <el-table
@@ -109,6 +98,7 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import AlbumOption from './components/album-option' // secondary package based on el-pagination
+import AuthOption from './components/auth-option' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
   { key: 1, display_name: '爱情公寓1' },
@@ -125,7 +115,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination, AlbumOption },
+  components: { Pagination, AlbumOption, AuthOption },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -153,15 +143,15 @@ export default {
         name: undefined,
         type: undefined,
         season: undefined,
+        auth_user_id: undefined,
         manage_name: constants.DEFAULT_MANAGE_NAME,
-        bili_name: constants.DEFAULT_BILI_NAME,
         sort: '+id'
       },
       manages: [],
       seasons: [],
       episodes: [
-
       ],
+      authOptions: null,
       albumOptions: null,
       biliOptions: constants.BILI_OPTIONS,
       albumSeasonOptions: null,
@@ -169,7 +159,6 @@ export default {
       calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
@@ -191,8 +180,7 @@ export default {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
@@ -203,7 +191,7 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchGet('/episode', this.listQuery).then(response => {
+      fetchGet('/api/episode', this.listQuery).then(response => {
         const data = response.data
         this.list = []
         data.data.episodes.forEach(ep => {
@@ -263,15 +251,6 @@ export default {
         type: ''
       }
     },
-    handleCreate() {
-      console.log(this.listQuery.manage_name)
-      /* this.resetTemp() */
-      /* this.dialogStatus = 'create' */
-      /* this.dialogFormVisible = true */
-      /* this.$nextTick(() => { */
-      /* this.$refs['dataForm'].clearValidate() */
-      /* }) */
-    },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
@@ -308,11 +287,11 @@ export default {
     episodeSplit(row) {
       var data = {
         manage_name: this.listQuery.manage_name,
-        bili_name: this.listQuery.bili_name,
+        auth_user_id: this.listQuery.auth_user_id,
         episode_id: row.id
       }
 
-      openURL('http://localhost:8006/episode/split', data)
+      openURL('http://localhost:8006/api/episode/split', data)
     },
     episodePartMake(row) {
       var data = {
@@ -322,39 +301,6 @@ export default {
       }
 
       openURL('http://localhost:8006/episode/part/make', data)
-    },
-    handleSplit(row) {
-      var data = {
-        manage_name: this.listQuery.manage_name,
-        bili_name: this.listQuery.bili_name,
-        episode_id: row.id
-      }
-      data.path = row.path
-      if (this.listQuery.bili_name === 'ipart') {
-        data.prefix = `${row.album}${row.season}.${row.ep}`
-        data.count = 2
-        if (this.listQuery.manage_name === 'ipartment') {
-          if (this.listQuery.season === 3) {
-            data.is_remove_bed = false
-          }
-        }
-        data.use_custom_title = true
-      } else if (this.listQuery.bili_name === 'xinxin') {
-        if (this.listQuery.manage_name === 'ipartment') {
-          data.count = 6
-        }
-      } else if (this.listQuery.bili_name === 'wen') {
-        data.prefix = `【${row.album}】${row.season}季${row.ep}集`
-        data.count = 3
-        if (this.listQuery.manage_name === 'ipartment') {
-          if (this.listQuery.season === 3) {
-            data.is_remove_bed = false
-          }
-        }
-        data.use_custom_title = true
-      }
-
-      openURL('/episode/split', data)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -388,20 +334,6 @@ export default {
       fetchPv(pv).then(response => {
         this.pvData = response.data.pvData
         this.dialogPvVisible = true
-      })
-    },
-    handleDownload() {
-      this.downloadLoading = true
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'importance', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'importance', 'status']
-        const data = this.formatJson(filterVal)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'table-list'
-        })
-        this.downloadLoading = false
       })
     },
     formatJson(filterVal) {
