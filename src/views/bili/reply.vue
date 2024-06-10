@@ -2,9 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.keyword" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.bili_name" placeholder="Bili" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in biliOptions" :key="item.key" :label="item.display_name" :value="item.key" />
-      </el-select>
+      <AuthOption v-model="listQuery" />
       <el-select v-model="listQuery.season" placeholder="季" clearable class="filter-item" style="width: 130px" @change="episodeChange">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
@@ -135,6 +133,7 @@ import { constants } from '@/utils/common'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import AuthOption from './components/auth-option' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
   { key: 1, display_name: '爱情公寓1' },
@@ -154,7 +153,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination, AuthOption },
   directives: { waves },
   filters: {
     followedFilter(isFollow) {
@@ -242,10 +241,10 @@ export default {
       this.listLoading = true
       var query = this.listQuery
       query.up_like = this.extQuery.up_like
-      fetchGet('/reply', query).then(response => {
+      fetchGet('/api/reply', query).then(response => {
         const data = response.data.data
         this.list = []
-        data.replys.forEach(reply => {
+        data.data.forEach(reply => {
           var content = ''
           if (reply.root_info !== undefined && reply.root_info !== null) {
             content += `原评论 ${reply.root_info.member.uname}: \n\t${reply.root_info.content.message}\n\n`

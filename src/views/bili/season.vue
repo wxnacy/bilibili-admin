@@ -5,6 +5,7 @@
       <el-select v-model="listQuery.bili_name" placeholder="Bili" clearable class="filter-item" style="width: 130px">
         <el-option v-for="item in biliOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
+      <AuthOption v-model="listQuery" />
       <el-select v-model="listQuery.season" placeholder="季" clearable class="filter-item" style="width: 130px" @change="episodeChange">
         <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
       </el-select>
@@ -147,6 +148,7 @@ import { constants } from '@/utils/common'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import AuthOption from './components/auth-option' // secondary package based on el-pagination
 
 const calendarTypeOptions = [
   { key: 1, display_name: '爱情公寓1' },
@@ -166,7 +168,7 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 
 export default {
   name: 'ComplexTable',
-  components: { Pagination },
+  components: { Pagination, AuthOption },
   directives: { waves },
   filters: {
     stateFilter(state) {
@@ -207,6 +209,7 @@ export default {
         type: undefined,
         season: undefined,
         status: undefined,
+        auth_user_id: undefined,
         bili_name: constants.DEFAULT_BILI_NAME,
         sort: undefined
       },
@@ -277,7 +280,7 @@ export default {
     },
     refresh() {
       this.listLoading = true
-      fetchGet('/season/refresh', { bili_name: this.listQuery.bili_name }).then(response => {
+      fetchGet('/season/refresh', { bili_name: this.listQuery.bili_name, auth_user_id: this.listQuery.auth_user_id }).then(response => {
         this.getList()
       })
     },

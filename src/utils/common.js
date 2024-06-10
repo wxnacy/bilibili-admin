@@ -9,6 +9,7 @@ export const constants = {
   DEFAULT_QUERY: {
     manage_name: 'ipartment',
     bili_name: 'wxnacy',
+    auth_user_id: 43798284,
     keyword: '',
     page: 1,
     pagesize: 20,
