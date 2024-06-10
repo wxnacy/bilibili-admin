@@ -8,6 +8,10 @@ export function getAlbumSeasons(albumId) {
   return fetchGet(`/album/${albumId}/season`)
 }
 
+export function getAuthUsers() {
+  return fetchGet('/api/auth/user')
+}
+
 export function openPath(path) {
   return fetchGet('/open', { 'path': path })
 }
@@ -76,5 +80,11 @@ export function loadEpisodeOptions(self) {
     const data = response.data
     const episodes = data.data.episodes
     self.episodeOptions = episodes
+  })
+}
+
+export function loadAuthOptions(self) {
+  getAuthUsers().then(res => {
+    self.authOptions = res.data.data.data
   })
 }
