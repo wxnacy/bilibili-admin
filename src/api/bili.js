@@ -1,7 +1,7 @@
 import { fetchGet } from '@/api/request'
 
 export function getAlbums() {
-  return fetchGet('/album')
+  return fetchGet('/api/album')
 }
 
 export function getAlbumSeasons(albumId) {
@@ -62,7 +62,7 @@ export function loadSeasonOptions(self) {
 
 export function loadAlbumOptions(self) {
   getAlbums().then(res => {
-    self.albumOptions = res.data.data.albums
+    self.albumOptions = res.data.data.data
   })
 }
 
