@@ -136,17 +136,7 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        pagesize: 30,
-        importance: undefined,
-        name: undefined,
-        type: undefined,
-        season: undefined,
-        auth_user_id: undefined,
-        manage_name: constants.DEFAULT_MANAGE_NAME,
-        sort: '+id'
-      },
+      listQuery: constants.DEFAULT_QUERY,
       manages: [],
       seasons: [],
       episodes: [
@@ -194,7 +184,7 @@ export default {
       fetchGet('/api/episode', this.listQuery).then(response => {
         const data = response.data
         this.list = []
-        data.data.episodes.forEach(ep => {
+        data.data.data.forEach(ep => {
           var archName = ''
           for (let index = 0; index < ep.archives.length; index++) {
             const arch = ep.archives[index]
@@ -296,11 +286,11 @@ export default {
     episodePartMake(row) {
       var data = {
         manage_name: this.listQuery.manage_name,
-        bili_name: this.listQuery.bili_name,
+        auth_user_id: this.listQuery.auth_user_id,
         episode_id: row.id
       }
 
-      openURL('http://localhost:8006/episode/part/make', data)
+      openURL('http://localhost:8006/api/episode/part/make', data)
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

@@ -1,6 +1,6 @@
 {
     "name": "bili-admin",
-    "cwd": "/Users/wxnacy/Documents/Projects/wxnacy/bilibili-admin",
+    "cwd": "/Users/wxnacy/Projects/bilibili-admin",
     "env": {
     },
     "script": "npm start",
